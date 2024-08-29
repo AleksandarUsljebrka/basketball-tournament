@@ -26,6 +26,7 @@ namespace BasketballTournament.Services
 					team.Losses = 0;
 					team.ScoredPoints = 0;
 					team.ConcededPoints = 0;
+					team.Group = group.Key;
 				}
 
 				// Simulacija utakmica izmedju svih parova timova u grupi
@@ -117,6 +118,81 @@ namespace BasketballTournament.Services
 					rank++;
 				}
 			}
+		}
+
+		public static List<List<BasketballTeam>> DrawTeams(Dictionary<string, List<BasketballTeam>> groupResults)
+		{
+			var rankedTeams = groupResults.SelectMany(gr => gr.Value)
+				.OrderByDescending(t => t.Points)
+				.ThenByDescending(t => t.PointDifference)
+				.ThenByDescending(t => t.ScoredPoints)
+				.ToList();
+
+			//var firstPlaceTeams = rankedTeams.Where((t, i) => i < 3).ToList();
+			//var secondPlaceTeams = rankedTeams.Where((t, i) => i >= 3 && i < 6).ToList();
+			//var thirdPlaceTeams = rankedTeams.Where((t, i) => i >= 6 && i < 9).ToList();
+
+			var potD = new List<BasketballTeam> { rankedTeams[0], rankedTeams[1] };
+			var potE = new List<BasketballTeam> { rankedTeams[2], rankedTeams[3] };
+			var potF = new List<BasketballTeam> { rankedTeams[4], rankedTeams[5] };
+			var potG = new List<BasketballTeam> { rankedTeams[6], rankedTeams[7] };
+
+			var tempPotD = new List<BasketballTeam>(potD);
+			var tempPotE = new List<BasketballTeam>(potE);
+			var tempPotF = new List<BasketballTeam>(potF);
+			var tempPotG = new List<BasketballTeam>(potG);
+
+			var pots = new List<List<BasketballTeam>> { potD, potE, potF, potG };
+			var random = new Random();
+
+			var quarterFinalPairs = new List<List<BasketballTeam>>();
+
+			// Formiranje parova za cetvrtfinale
+			while (tempPotD.Any() && tempPotG.Any())
+			{
+				var team1 = tempPotD[random.Next(tempPotD.Count)];
+				var team2 = tempPotG[random.Next(tempPotG.Count)];
+
+				if (!team1.Group.Equals(team2.Group))
+				{
+					quarterFinalPairs.Add(new List<BasketballTeam> { team1, team2 });
+					tempPotD.Remove(team1);
+					tempPotG.Remove(team2);
+				}
+			}
+
+			while (tempPotE.Any() && tempPotF.Any())
+			{
+				var team1 = tempPotE[random.Next(tempPotE.Count)];
+				var team2 = tempPotF[random.Next(tempPotF.Count)];
+
+				if (!team1.Group.Equals(team2.Group))
+				{
+					quarterFinalPairs.Add(new List<BasketballTeam> { team1, team2 });
+					tempPotE.Remove(team1);
+					tempPotF.Remove(team2);
+
+				}
+			}
+
+			Console.WriteLine("\nŠeširi:");
+			var potNames = new[] { "Šešir D", "Šešir E", "Šešir F", "Šešir G" };
+			for (int i = 0; i < pots.Count; i++)
+			{
+				Console.WriteLine($"    {potNames[i]}:");
+				foreach (var team in pots[i])
+				{
+					Console.WriteLine($"        {team.Team}");
+				}
+			}
+
+			Console.WriteLine("\nEliminaciona faza:");
+			foreach (var pair in quarterFinalPairs)
+			{
+				Console.WriteLine($"    {pair[0].Team} - {pair[1].Team}");
+			}
+
+			return quarterFinalPairs;
 		}
 
 	}

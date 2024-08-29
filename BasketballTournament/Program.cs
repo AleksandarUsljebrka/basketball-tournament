@@ -17,5 +17,7 @@ internal class Program
 		var groupResults = TournamentService.SimulateGroupPhase(groups);
 
 		TournamentService.DisplayGroupResults(groupResults);
+		
+		var quarterFinalist = TournamentService.DrawTeams(groupResults);
 	}
 }

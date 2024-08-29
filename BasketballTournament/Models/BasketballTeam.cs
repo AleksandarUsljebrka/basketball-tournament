@@ -12,6 +12,7 @@ namespace BasketballTournament.Models
 		public int ScoredPoints { get; set; } = 0;
 		public int ConcededPoints { get; set; } = 0;
 		public int PointDifference => ScoredPoints - ConcededPoints;
+		public string Group { get; set; }
 	}
 
 }
