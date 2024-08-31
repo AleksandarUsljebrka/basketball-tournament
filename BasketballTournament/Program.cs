@@ -19,5 +19,6 @@ internal class Program
 		TournamentService.DisplayGroupResults(groupResults);
 		
 		var quarterFinalist = TournamentService.DrawTeams(groupResults);
+		TournamentService.SimulateKnockoutPhase(quarterFinalist);
 	}
 }

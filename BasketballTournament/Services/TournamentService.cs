@@ -195,5 +195,69 @@ namespace BasketballTournament.Services
 			return quarterFinalPairs;
 		}
 
+		public static BasketballTeam SimulateMatch(BasketballTeam teamA, BasketballTeam teamB)
+		{
+			var random = new Random();
+			var scoreA = random.Next(70, 101) + (teamB.FIBARanking - teamA.FIBARanking);
+			var scoreB = random.Next(70, 101) + (teamA.FIBARanking - teamB.FIBARanking);
+
+			teamA.ScoredPoints += scoreA;
+			teamA.ConcededPoints += scoreB;
+			teamB.ScoredPoints += scoreB;
+			teamB.ConcededPoints += scoreA;
+
+			Console.WriteLine($"    {teamA.Team} - {teamB.Team} ({scoreA}:{scoreB})");
+
+			return scoreA > scoreB ? teamA : teamB;
+		}
+
+		public static void SimulateKnockoutPhase(List<List<BasketballTeam>> quarterFinalPairs)
+		{
+			var semiFinalParticipants = new List<BasketballTeam>();
+
+			Console.WriteLine("\nČetvrtfinale:");
+			foreach (var pair in quarterFinalPairs)
+			{
+				var winner = SimulateMatch(pair[0], pair[1]);
+				semiFinalParticipants.Add(winner);
+			}
+
+			Console.WriteLine("\nPolufinale:");
+
+			var finalist1 = SimulateMatch(semiFinalParticipants[0], semiFinalParticipants[1]);
+			var finalist2 = SimulateMatch(semiFinalParticipants[2], semiFinalParticipants[3]);
+
+			var thirdPlaceParticipant1 = GetLoser(finalist1, semiFinalParticipants[0], semiFinalParticipants[1]);
+			var thirdPlaceParticipant2 = GetLoser(finalist2, semiFinalParticipants[2], semiFinalParticipants[3]);
+
+            Console.WriteLine("\nMeč za treće mesto:");
+            var thirdPlaceWinner = SimulateMatch(thirdPlaceParticipant1, thirdPlaceParticipant2);
+
+
+			Console.WriteLine("\nFinale:");
+			var champion = SimulateMatch(finalist1, finalist2);
+			var secondPlace = finalist1.Team == champion.Team ? finalist2.Team : finalist1.Team;
+			Console.WriteLine("\nMedalje:");
+			Console.WriteLine($"    1. {champion.Team}");
+			Console.WriteLine($"    2. {secondPlace}");
+			Console.WriteLine($"    3. {thirdPlaceWinner.Team}");
+
+		}
+
+		public static BasketballTeam GetLoser(BasketballTeam winner,BasketballTeam participant1, BasketballTeam participant2)
+		{
+			if(participant1.Team == winner.Team)
+			{
+				return participant2;
+			}
+			else
+			{
+				return participant1;
+			}
+		}
+		
+
+		
+
 	}
 }
